@@ -71,10 +71,10 @@ struct FEIK_PositionalVoiceChat
 	GENERATED_BODY()
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="EOS Integration Kit|Voice Chat")
-	FString ChannelName;
+	FString ChannelName{};
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="EOS Integration Kit|Voice Chat")
-	float MaxHearingDistance;	
+	float MaxHearingDistance{};	
 };
 
 DECLARE_DYNAMIC_DELEGATE_TwoParams(FEIKResultDelegate, bool, bWasSuccess, EEVIKResultCodes, Result);

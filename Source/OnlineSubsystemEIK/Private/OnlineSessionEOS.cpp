@@ -863,7 +863,11 @@ void FOnlineSessionEOS::OnMemberStatusReceived(const EOS_LobbyId& LobbyId, const
 						{
 							RemoveOnlineSessionMember(Session->SessionName, ResolvedUniqueNetId);
 
+#if ENGINE_MAJOR_VERSION == 5 && ENGINE_MINOR_VERSION >= 5
+							TriggerOnSessionParticipantLeftDelegates(Session->SessionName, *ResolvedUniqueNetId, EOnSessionParticipantLeftReason::Left);
+#else
 							TriggerOnSessionParticipantsChangeDelegates(Session->SessionName, *ResolvedUniqueNetId, false);
+#endif
 						}
 						else
 						{
@@ -884,7 +888,11 @@ void FOnlineSessionEOS::OnMemberStatusReceived(const EOS_LobbyId& LobbyId, const
 						{
 							RemoveOnlineSessionMember(Session->SessionName, ResolvedUniqueNetId);
 
+#if ENGINE_MAJOR_VERSION == 5 && ENGINE_MINOR_VERSION >= 5
+							TriggerOnSessionParticipantLeftDelegates(Session->SessionName, * ResolvedUniqueNetId, EOnSessionParticipantLeftReason::Kicked);
+#else
 							TriggerOnSessionParticipantRemovedDelegates(Session->SessionName, *ResolvedUniqueNetId);
+#endif
 						}
 						else
 						{
@@ -3206,7 +3214,11 @@ void FOnlineSessionEOS::UpdateOrAddLobbyMember(const FUniqueNetIdEOSLobbyRef& Lo
 
 				if (bWasLobbyMemberAdded)
 				{
+#if ENGINE_MAJOR_VERSION == 5 && ENGINE_MINOR_VERSION >= 5
+					TriggerOnSessionParticipantJoinedDelegates(Session->SessionName, *PlayerId);
+#else
 					TriggerOnSessionParticipantsChangeDelegates(Session->SessionName, *PlayerId, true);
+#endif
 				}
 				else
 				{
@@ -3458,7 +3470,14 @@ bool FOnlineSessionEOS::UnregisterPlayers(FName SessionName, const TArray< FUniq
 			int32 RegistrantIndex = Session->RegisteredPlayers.IndexOfByPredicate(PlayerMatch);
 			if (bUnregisterEOS)
 			{
-				EOSIds.Add(PlayerEOSId.GetProductUserId());
+				if(!PlayerEOSId.ToString().Contains(EOS_ID_SEPARATOR))
+				{
+					EOSIds.Add(EOS_ProductUserId_FromString(TCHAR_TO_UTF8(*PlayerEOSId.ToString())));
+				}
+				else
+				{
+					EOSIds.Add(PlayerEOSId.GetProductUserId());
+				}
 			}
 			RemoveOnlineSessionMember(SessionName, PlayerId);
 		}
